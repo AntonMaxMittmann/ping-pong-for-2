@@ -1,19 +1,31 @@
 radio.onReceivedNumber(function (receivedNumber) {
-    x_position = receivedNumber
-    ball = game.createSprite(x_position, 0)
-    basic.pause(500)
-    for (let index = 0; index < 4; index++) {
-        ball.change(LedSpriteProperty.Y, 1)
-        basic.pause(500)
-    }
-    if (schlaeger.get(LedSpriteProperty.X) == ball.get(LedSpriteProperty.X)) {
-        music.playTone(988, music.beat(BeatFraction.Whole))
-        posTest()
-    } else {
-        basic.showString("You lose!")
-        music.playMelody("C5 A B G A F G E ", 391)
-        ball.delete()
+    if (receivedNumber == 10) {
+        basic.clearScreen()
+        basic.showLeds(`
+            . . . # #
+            . # . . #
+            # # # . #
+            . # . . #
+            . . . . #
+            `)
+        counter += 1
         schlaeger.delete()
+        schlaeger = game.createSprite(2, 4)
+    } else {
+        ball = game.createSprite(receivedNumber, 0)
+        basic.pause(500)
+        for (let index = 0; index < 4; index++) {
+            ball.change(LedSpriteProperty.Y, 1)
+            basic.pause(500)
+        }
+        if (schlaeger.get(LedSpriteProperty.X) == ball.get(LedSpriteProperty.X)) {
+            posTest()
+        } else {
+            radio.sendNumber(10)
+            ball.delete()
+            schlaeger.delete()
+            schlaeger = game.createSprite(2, 4)
+        }
     }
 })
 input.onButtonEvent(Button.A, input.buttonEventClick(), function () {
@@ -23,19 +35,17 @@ input.onButtonEvent(Button.B, input.buttonEventClick(), function () {
     schlaeger.change(LedSpriteProperty.X, 1)
 })
 function posTest () {
-    if (ball.get(LedSpriteProperty.Y) == 4) {
-        ball.delete()
-        ball = game.createSprite(randint(0, 4), 4)
-        for (let index = 0; index < 4; index++) {
-            ball.change(LedSpriteProperty.Y, -1)
-            basic.pause(500)
-        }
-        radio.sendNumber(ball.get(LedSpriteProperty.Y))
-        ball.delete()
+    ball.delete()
+    ball = game.createSprite(randint(0, 4), 4)
+    for (let index = 0; index < 4; index++) {
+        ball.change(LedSpriteProperty.Y, -1)
+        basic.pause(500)
     }
+    radio.sendNumber(ball.get(LedSpriteProperty.X))
+    ball.delete()
 }
 let ball: game.LedSprite = null
-let x_position = 0
 let schlaeger: game.LedSprite = null
+let counter = 0
 schlaeger = game.createSprite(2, 4)
 radio.setGroup(1)
